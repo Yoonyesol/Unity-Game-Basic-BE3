@@ -4,41 +4,98 @@ using UnityEngine;
 
 public class PlayerAction : MonoBehaviour
 {
+    public GameManager manager;
     public float Speed;
     float h;
     float v;
     bool isHorizonMove;
+    Vector3 dirVec;
+    GameObject scanObject;
 
     Rigidbody2D rigid;
+    SpriteRenderer spriteRenderer;
+    CapsuleCollider2D capsuleCollider;
+    Animator anim;
+    AudioSource audioSource;
 
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        capsuleCollider = GetComponent<CapsuleCollider2D>();
+        anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
         //Move Value
-        h = Input.GetAxisRaw("Horizontal");
-        v = Input.GetAxisRaw("Vertical");
+        h = manager.isAction ? 0 : Input.GetAxisRaw("Horizontal");
+        v = manager.isAction ? 0 : Input.GetAxisRaw("Vertical");
 
         //Check Button Down & Up
-        bool hDown = Input.GetButtonDown("Horizontal");
-        bool vDown = Input.GetButtonDown("Vertical");
-        bool hUp = Input.GetButtonDown("Horizontal");
-        bool vUp = Input.GetButtonDown("Vertical");
-        
+        bool hDown = manager.isAction ? false : Input.GetButtonDown("Horizontal");
+        bool vDown = manager.isAction ? false : Input.GetButtonDown("Vertical");
+        bool hUp = manager.isAction ? false : Input.GetButtonUp("Horizontal");
+        bool vUp = manager.isAction ? false : Input.GetButtonUp("Vertical");
+
         //Check Horizontal Move
         if (hDown)
             isHorizonMove = true; //수평이동
         else if (vDown)
             isHorizonMove = false; //수직이동
+        else if (hUp || vUp)
+            isHorizonMove = h != 0; //현재 속도를 측정해서 check
+
+        //Animation
+        if(anim.GetInteger("hAxisRaw")!= h)
+        {
+            anim.SetBool("isChange", true);
+            anim.SetInteger("hAxisRaw", (int)h);
+        }
+        else if (anim.GetInteger("vAxisRaw") != v)
+        {
+            anim.SetBool("isChange", true);
+            anim.SetInteger("vAxisRaw", (int)v);
+        }
+        else
+        {
+            anim.SetBool("isChange", false);
+        }
+
+        //Direction
+        if (vDown && v == 1)
+            dirVec = Vector3.up;
+        else if (vDown && v == -1)
+            dirVec = Vector3.down;
+        else if (hDown && h == -1)
+            dirVec = Vector3.left;
+        else if (hDown && h == 1)
+            dirVec = Vector3.right;
+
+        //Scan Object & Action
+        if (Input.GetButtonDown("Jump") && scanObject != null)
+            manager.Action(scanObject);
     }
 
     private void FixedUpdate()
     {
         //Move
         Vector2 moveVec = isHorizonMove ? new Vector2(h, 0) : new Vector2(0, v);
-        rigid.velocity = moveVec * Speed; 
+        rigid.velocity = moveVec * Speed;
+
+        //Ray
+        Debug.DrawRay(rigid.position, dirVec *0.7f, new Color(0,1,0));
+        RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, dirVec, 0.7f, LayerMask.GetMask("Object"));
+
+        if (rayHit.collider != null) //RayCast된 오브젝트를 변수로 저장하여 활용
+        {
+            scanObject = rayHit.collider.gameObject;
+        }
+        else
+            scanObject = null;
+
+
+
     }
 }
