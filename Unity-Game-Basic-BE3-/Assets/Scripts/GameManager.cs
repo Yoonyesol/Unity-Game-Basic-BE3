@@ -7,12 +7,14 @@ public class GameManager : MonoBehaviour
 {
     public TalkManager talkManager;
     public QuestManager questManager;
-    public GameObject talkPanel;
+    public Animator talkPanel;
     public Image portraitImg;
-    public Text talkText;
+    public Animator portraitAnim;
+    public TypeEffects talk;
     public GameObject scanObject;
     public bool isAction;
     public int talkIndex;
+    public Sprite prevPortrait;
 
     private void Start()
     {
@@ -25,16 +27,27 @@ public class GameManager : MonoBehaviour
         scanObject = scanObj;
         ObjData objData = scanObject.GetComponent<ObjData>();
         Talk(objData.id, objData.isNpc);
-        
+
         //visible Talk for Acrion
-        talkPanel.SetActive(isAction);
+        talkPanel.SetBool("isShow", isAction);
     }
 
     void Talk(int id, bool isNpc)
     {
         //Set Talk Data
-        int questTalkIndex = questManager.GetQuestTalkIndex(id);
-        string talkData = talkManager.GetTalk(id + questTalkIndex, talkIndex);
+        int questTalkIndex = 0;
+        string talkData = "";
+
+        if (talk.isAnim)
+        {
+            talk.SetMsg("");
+            return;
+        }   
+        else
+        {
+            questTalkIndex = questManager.GetQuestTalkIndex(id);
+            talkData = talkManager.GetTalk(id + questTalkIndex, talkIndex);
+        }
         //퀘스트 번호 + NPC Id = 퀘스트 대화 데이터 id
 
         //End Talk
@@ -49,17 +62,28 @@ public class GameManager : MonoBehaviour
         //Continue Talk
         if (isNpc)
         {
-            talkText.text = talkData.Split(':')[0];
+            talk.SetMsg(talkData.Split(':')[0]);
+
+            //Show Portrait
             portraitImg.sprite = talkManager.GetPortrait(id, int.Parse(talkData.Split(':')[1]));
             portraitImg.color = new Color(1, 1, 1, 1);
+
+            //Animation Portrait
+            if (prevPortrait != portraitImg.sprite)
+            {
+                portraitAnim.SetTrigger("doEffect");
+                prevPortrait = portraitImg.sprite;
+            }
         }
         else
         {
-            talkText.text = talkData;
+            talk.SetMsg(talkData);
 
+            //Hide Portrait
             portraitImg.color = new Color(1, 1, 1, 0);
         }
 
+        //Next Talk
         isAction = true;
         talkIndex++;
     }

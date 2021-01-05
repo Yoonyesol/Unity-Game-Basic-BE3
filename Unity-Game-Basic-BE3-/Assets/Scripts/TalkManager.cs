@@ -35,7 +35,7 @@ public class TalkManager : MonoBehaviour
                                                "이 마을에는 놀라운 전설이 있어.:1",
                                                "오른쪽 호수의 루도가 알려줄거야.:0"});
         talkData.Add(11 + 1000, new string[] { "아직 못 만났어?:0",
-                                               "루도는 오른쪽 호수에 있어:0" });
+                                               "루도는 오른쪽 호수에 있어.:0" });
         talkData.Add(11 + 2000, new string[] { "안녕.:1",
                                                "이 호수의 전설을 들으러 온 거야?:0",
                                                "그럼 일 좀 하나 해 주면 좋을 텐데...:1",
@@ -44,7 +44,7 @@ public class TalkManager : MonoBehaviour
         talkData.Add(20 + 1000, new string[] { "루도의 동전?:1",
                                                "돈을 흘리고 다니면 못 쓰지!:3",
                                                "나중에 루도에게 한 마디 해야겠어.:3"});
-        talkData.Add(20 + 2000, new string[] { "찾으면 꼭 좀 가져다 줘."});
+        talkData.Add(20 + 2000, new string[] { "동전을 찾으면 꼭 좀 가져다 줘.:2"});
         talkData.Add(20 + 5000, new string[] { "근처에서 동전을 찾았다."});
         
         talkData.Add(21 + 2000, new string[] { "엇, 찾아줘서 고마워.:2"});
