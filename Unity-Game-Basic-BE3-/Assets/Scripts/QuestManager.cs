@@ -63,7 +63,7 @@ public class QuestManager : MonoBehaviour
         questActionIndex = 0;
     }
 
-    void ControlObject()
+    public void ControlObject()
     {
         switch (questId)
         {
@@ -72,9 +72,12 @@ public class QuestManager : MonoBehaviour
                     questObjects[0].SetActive(true);
                 break;
             case 20:
-                if (questActionIndex == 1)
+                //불러오기 했을 당시의 퀘스트 순서와 연결된 오브젝트 관리 추가
+                if (questActionIndex == 0)
+                    questObjects[0].SetActive(true);
+                else if (questActionIndex == 1)
                     questObjects[0].SetActive(false);
-                break;
+                    break;         
         }
     }
 }
